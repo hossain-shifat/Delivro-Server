@@ -12,6 +12,8 @@ await connectDB();
 
 app.post("/api/clerk", express.raw({ type: "application/json" }), clerkWebhook);
 
+// test message
+
 // Middleware
 app.use(cors());
 app.use(express.json());
