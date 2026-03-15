@@ -18,7 +18,7 @@ ProductRouter.get("/:id", getProduct);
 // Craete product (Admin only)
 ProductRouter.post(
     "/",
-    upload.array("images", 5),
+    // upload.array("images", 5),
     protect,
     authorize("admin"),
     createProduct,

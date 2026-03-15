@@ -51,53 +51,34 @@ export const getProduct = async (req: Request, res: Response) => {
 
 export const createProduct = async (req: Request, res: Response) => {
     try {
-        let images = [];
+        const { images, sizes, ...rest } = req.body;
 
-        // Handle file upload
-        if (req.files && (req.files as any).length > 0) {
-            const uploadPromises = (req.files as any).map((file: any) => {
-                return new Promise((resolve, reject) => {
-                    const uploadStream = cloudinary.uploader.upload_stream(
-                        { folder: "delivro/products" },
-                        (error, result) => {
-                            if (error) reject(error);
-                            else resolve(result!.secure_url);
-                        },
-                    );
-                    uploadStream.end(file.buffer);
-                });
-            });
-            images = await Promise.all(uploadPromises);
-        }
-
-        let sizes = req.body.sizes || [];
-        if (typeof sizes === "string") {
-            try {
-                sizes = JSON.parse(sizes);
-            } catch (error) {
-                sizes = sizes
-                    .split(",")
-                    .map((s: string) => s.trim())
-                    .filter((s: string) => s !== "");
-            }
-        }
-        // Ensure they are arrays
-        if (!Array.isArray(sizes)) sizes = [sizes];
-
-        const productData = {
-            ...req.body,
-            images: images,
-            sizes,
-        };
-
-        if (images.length === 0) {
+        if (!images || images.length === 0) {
             return res.status(400).json({
                 success: false,
                 message: "Please upload at least one image",
             });
         }
 
-        const product = await Product.create(productData);
+        // Parse sizes if it's a string
+        let parsedSizes = sizes || [];
+        if (typeof parsedSizes === "string") {
+            try {
+                parsedSizes = JSON.parse(parsedSizes);
+            } catch {
+                parsedSizes = parsedSizes
+                    .split(",")
+                    .map((s: string) => s.trim())
+                    .filter(Boolean);
+            }
+        }
+        if (!Array.isArray(parsedSizes)) parsedSizes = [parsedSizes];
+
+        const product = await Product.create({
+            ...rest,
+            images,
+            sizes: parsedSizes,
+        });
         res.status(201).json({ success: true, data: product });
     } catch (error: any) {
         res.status(500).json({ success: false, message: error.message });
@@ -204,16 +185,15 @@ export const deleteProduct = async (req: Request, res: Response) => {
                 const publicIdMatch = imageUrl.match(/\/v\d+\/(.+).[a-z]+$/);
                 const publicId = publicIdMatch ? publicIdMatch[1] : null;
                 if (publicId) {
-                    return cloudinary.uploader.destroy(publicId)
+                    return cloudinary.uploader.destroy(publicId);
                 }
-                return Promise.resolve()
+                return Promise.resolve();
             });
-            await Promise.all(deletePromises)
+            await Promise.all(deletePromises);
         }
 
-        await Product.findByIdAndDelete(req.params.id)
-        response.json({success:true,message:"Product deleted"})
-
+        await Product.findByIdAndDelete(req.params.id);
+        response.json({ success: true, message: "Product deleted" });
     } catch (error: any) {
         res.status(500).json({ success: false, message: error.message });
     }

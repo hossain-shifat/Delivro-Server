@@ -13,6 +13,7 @@ const productSchema = new Schema<IProduct>(
             enum: ["Men", "Women", "Kids", "Shoes", "Bags", "Other"],
             default: "Other",
         },
+        sizes: [{ type: String, default: [] }],
         stock: { type: Number, required: true, default: 0, min: 0 },
         isFeatured: { type: Boolean, required: true, default: false },
     },
