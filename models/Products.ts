@@ -16,6 +16,7 @@ const productSchema = new Schema<IProduct>(
         stock: { type: Number, required: true, default: 0, min: 0 },
         sizes: [{ type: String, default: [] }],
         isFeatured: { type: Boolean, required: true, default: false },
+        isActive: { type: Boolean, default: true },
     },
     { timestamps: true },
 );
