@@ -40,7 +40,7 @@ export const getProduct = async (req: Request, res: Response) => {
                 .json({ success: false, message: "Product not found" });
         }
 
-        res.status(404).json({ success: true, data: product });
+        res.json({ success: true, data: product });
     } catch (error: any) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -160,7 +160,7 @@ export const updateProduct = async (req: Request, res: Response) => {
                 .json({ success: false, message: "Product not found" });
         }
 
-        res.json({ success: true, data: product });
+        res.status(200).json({ success: true, data: product });
     } catch (error: any) {
         res.status(500).json({ success: false, message: error.message });
     }
