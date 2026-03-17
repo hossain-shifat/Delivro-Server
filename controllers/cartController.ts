@@ -64,7 +64,7 @@ export const addToCart = async (req: Request, res: Response) => {
         cart.calculateTotal();
         await cart.save();
 
-        await cart.populate("item.product", "name images price stock");
+        await cart.populate("items.product", "name images price stock");
         res.json({ success: true, data: cart });
     } catch (error: any) {
         res.status(500).json({ success: false, message: error.message });
@@ -114,6 +114,7 @@ export const updateCartItem = async (req: Request, res: Response) => {
         cart.calculateTotal();
         await cart.save();
         await cart.populate("items.product", "name images price stock");
+        res.json({ success: true, data: cart });
     } catch (error: any) {
         res.status(500).json({ success: false, message: error.message });
     }
