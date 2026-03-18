@@ -11,7 +11,13 @@ export const protect = async ( req: Request, res: Response, next: NextFunction )
                 message:"Not authorized"
             })
         }
-        let user = await User.findOne({clerkId:userId})
+        const user = await User.findOne({clerkId:userId})
+        if (!user) {
+            return res.status(401).json({
+                success:false,
+                message:"User account not found",
+            });
+        }
         req.user=user
         next()
     } catch (error) {
